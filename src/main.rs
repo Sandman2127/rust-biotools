@@ -4,11 +4,11 @@ use std::str;
 use clap::{Parser, Subcommand};
 
 #[derive(Parser)]
-#[clap(author, version, about, long_about = None)]
+#[clap(author, version, about, long_about = "A collection of useful bioinformatics functions I've found on written up in Rust over the years")]
 struct Cli {
-    /// Optional name to operate on
+    /// A DNA sequence to operate on
     #[clap(value_parser)]
-    name: Option<String>,
+    seq: Option<String>,
 
     /// Sets a custom config file
     #[clap(short, long, value_parser, value_name = "FILE")]
@@ -26,22 +26,22 @@ enum Commands {
     },
 }
 
-fn returnReverseComplement(input:&str){
+fn return_reverse_complement(input:&str){
     println!("Value for name: {}",input);
     let output = bio::alphabets::dna::revcomp(input.as_bytes());
     let outstr = match str::from_utf8(&output){ 
         Ok(v) => v, 
         Err(e) => panic!("Invalid UTF-8 sequence: {}", e),
     };
-    println!("Reverse Complement for name: {:?}",outstr);
+    println!("Reverse Complement for name: {}",outstr);
 }
 
 fn main() {
     let cli = Cli::parse();
 
     // You can check the value provided by positional arguments, or option arguments
-    if let Some(name) = cli.name.as_deref() {
-        returnReverseComplement(name);
+    if let Some(sequence) = cli.seq.as_deref() {
+        return_reverse_complement(sequence);
     }
 
     if let Some(config_path) = cli.config.as_deref() {
