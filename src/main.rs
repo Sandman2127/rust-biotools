@@ -1,5 +1,7 @@
 extern crate bio;
-use std::path::PathBuf;
+// use crate rust_htslib::bcf::{Reader,Read};
+mod vcf_parser;
+use std::process;
 use std::str;
 use clap::{Parser, Subcommand};
 
@@ -10,9 +12,9 @@ struct Cli {
     #[clap(value_parser)]
     seq: Option<String>,
 
-    /// Sets a custom config file
+    /// Path to a vcf input file
     #[clap(short, long, value_parser, value_name = "FILE")]
-    config: Option<PathBuf>,
+    vcf: Option<String>,
 
 }
 
@@ -27,14 +29,17 @@ enum Commands {
 }
 
 fn return_reverse_complement(input:&str){
-    println!("Value for name: {}",input);
+    println!("[STDOUT]: Value for name: {}",input);
     let output = bio::alphabets::dna::revcomp(input.as_bytes());
     let outstr = match str::from_utf8(&output){ 
         Ok(v) => v, 
         Err(e) => panic!("Invalid UTF-8 sequence: {}", e),
     };
-    println!("Reverse Complement for name: {}",outstr);
+    println!("[STDOUT]: Reverse Complement for name: {}",outstr);
 }
+
+
+
 
 fn main() {
     let cli = Cli::parse();
@@ -42,10 +47,12 @@ fn main() {
     // You can check the value provided by positional arguments, or option arguments
     if let Some(sequence) = cli.seq.as_deref() {
         return_reverse_complement(sequence);
+        process::exit(0x0000);
     }
 
-    if let Some(config_path) = cli.config.as_deref() {
-        println!("Value for config: {}", config_path.display());
+    if let Some(vcf) = cli.vcf.as_deref() {
+        println!("[STDOUT]: Parsing VCF from path: {}", vcf);
+        vcf_parser::parse_vcf(vcf);
     }
 
 
